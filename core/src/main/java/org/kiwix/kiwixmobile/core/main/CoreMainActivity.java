@@ -40,7 +40,6 @@ import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.WindowManager;
-import android.view.animation.AnimationUtils;
 import android.webkit.WebView;
 import android.widget.Button;
 import android.widget.FrameLayout;
@@ -48,10 +47,10 @@ import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.Toast;
-import androidx.annotation.AnimRes;
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.ActionBar;
 import androidx.appcompat.app.AlertDialog;
+import androidx.appcompat.app.AppCompatDelegate;
 import androidx.appcompat.widget.AppCompatButton;
 import androidx.appcompat.widget.Toolbar;
 import androidx.constraintlayout.widget.ConstraintLayout;
@@ -212,6 +211,8 @@ public abstract class CoreMainActivity extends BaseActivity
   private List<DocumentSection> documentSections;
   private boolean isBackToTopEnabled = false;
   private boolean wasHideToolbar = true;
+  private boolean wasNightMode = true;
+  private boolean isNightMode = true;
   private boolean isHideToolbar = true;
   private boolean isOpenNewTabInBackground;
   private boolean isExternalLinkPopup;
@@ -310,24 +311,6 @@ public abstract class CoreMainActivity extends BaseActivity
       public void onSwipeBottom() {
         showTabSwitcher();
       }
-
-      @Override
-      public void onSwipeLeft() {
-        if (currentWebViewIndex < webViewList.size() - 1) {
-          View current = getCurrentWebView();
-          startAnimation(current, R.anim.transition_left);
-          selectTab(currentWebViewIndex + 1);
-        }
-      }
-
-      @Override
-      public void onSwipeRight() {
-        if (currentWebViewIndex > 0) {
-          View current = getCurrentWebView();
-          startAnimation(current, R.anim.transition_right);
-          selectTab(currentWebViewIndex - 1);
-        }
-      }
     });
 
     tableDrawerRight =
@@ -337,6 +320,14 @@ public abstract class CoreMainActivity extends BaseActivity
 
     isHideToolbar = sharedPreferenceUtil.getPrefHideToolbar();
 
+    if(sharedPreferenceUtil.getPrefNightMode().equals(""+AppCompatDelegate.MODE_NIGHT_NO)) {
+      isNightMode = false;
+      wasNightMode = isNightMode;
+    }
+    else {
+      isNightMode = true;
+      wasNightMode = isNightMode;
+    }
     addFileReader();
     setupTabsAdapter();
     setTableDrawerInfo();
@@ -353,6 +344,7 @@ public abstract class CoreMainActivity extends BaseActivity
     handleIntentExtras(getIntent());
 
     wasHideToolbar = isHideToolbar;
+
     booksAdapter = new BooksOnDiskAdapter(
       new BookOnDiskDelegate.BookDelegate(sharedPreferenceUtil,
         bookOnDiskItem -> {
@@ -488,16 +480,11 @@ public abstract class CoreMainActivity extends BaseActivity
     progressBar.setVisibility(View.GONE);
     backToTopButton.hide();
     tabSwitcherRoot.setVisibility(View.VISIBLE);
-    startAnimation(tabSwitcherRoot, R.anim.slide_down);
     if (tabsAdapter.getSelected() < webViewList.size() &&
       tabRecyclerView.getLayoutManager() != null) {
       tabRecyclerView.getLayoutManager().scrollToPosition(tabsAdapter.getSelected());
     }
     mainMenu.showTabSwitcherOptions();
-  }
-
-  private void startAnimation(View view, @AnimRes int anim) {
-    view.startAnimation(AnimationUtils.loadAnimation(view.getContext(), anim));
   }
 
   protected void hideTabSwitcher() {
@@ -508,7 +495,6 @@ public abstract class CoreMainActivity extends BaseActivity
       drawerLayout.setDrawerLockMode(DrawerLayout.LOCK_MODE_UNLOCKED);
       closeAllTabsButton.setImageDrawable(
         ContextCompat.getDrawable(this, R.drawable.ic_close_black_24dp));
-      startAnimation(tabSwitcherRoot, R.anim.slide_up);
       tabSwitcherRoot.setVisibility(View.GONE);
       progressBar.setVisibility(View.VISIBLE);
       contentFrame.setVisibility(View.VISIBLE);
@@ -1077,7 +1063,7 @@ public abstract class CoreMainActivity extends BaseActivity
     zimReaderContainer.setZimFile(file);
     if (zimReaderContainer.getZimFileReader() != null) {
       if (mainMenu != null) {
-        mainMenu.onFileOpened(zimReaderContainer.getZimFileReader(), !urlIsInvalid());
+        mainMenu.onFileOpened(zimReaderContainer.getZimFileReader());
       }
       openMainPage();
       presenter.loadCurrentZimBookmarksUrl();
@@ -1203,6 +1189,9 @@ public abstract class CoreMainActivity extends BaseActivity
       }
       selectTab(currentWebViewIndex);
       setUpWebViewWithTextToSpeech();
+    }
+    if(wasNightMode != isNightMode){
+      recreate();
     }
     presenter.loadCurrentZimBookmarksUrl();
 
@@ -1508,8 +1497,10 @@ public abstract class CoreMainActivity extends BaseActivity
   private void updateNightMode() {
     if (nightModeConfig.isNightModeActive()) {
       getCurrentWebView().activateNightMode();
+      isNightMode = true;
     } else {
       getCurrentWebView().deactivateNightMode();
+      isNightMode = false;
     }
   }
 
@@ -1688,5 +1679,4 @@ public abstract class CoreMainActivity extends BaseActivity
   private boolean checkNull(View view) {
     return view != null;
   }
-
 }

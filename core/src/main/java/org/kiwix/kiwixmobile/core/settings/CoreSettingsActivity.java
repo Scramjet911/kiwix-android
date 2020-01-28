@@ -22,14 +22,12 @@ import android.app.Fragment;
 import android.content.Intent;
 import android.os.Bundle;
 import androidx.appcompat.widget.Toolbar;
-import org.jetbrains.annotations.NotNull;
-import org.kiwix.kiwixmobile.core.CoreApp;
 import org.kiwix.kiwixmobile.core.R;
 import org.kiwix.kiwixmobile.core.base.BaseActivity;
-import org.kiwix.kiwixmobile.core.di.components.CoreComponent;
 
 import static org.kiwix.kiwixmobile.core.utils.Constants.EXTRA_WEBVIEWS_LIST;
 import static org.kiwix.kiwixmobile.core.utils.Constants.RESULT_HISTORY_CLEARED;
+import static org.kiwix.kiwixmobile.core.utils.Constants.RESULT_NIGHT_MODE_CHANGED;
 
 public abstract class CoreSettingsActivity extends BaseActivity {
 
@@ -37,6 +35,7 @@ public abstract class CoreSettingsActivity extends BaseActivity {
 
   @Override
   public void onCreate(Bundle savedInstanceState) {
+
     super.onCreate(savedInstanceState);
     setContentView(R.layout.settings);
 
@@ -61,6 +60,15 @@ public abstract class CoreSettingsActivity extends BaseActivity {
       setResult(RESULT_HISTORY_CLEARED, data);
     }
     super.onBackPressed();
+    recreate();
+  }
+
+  @Override
+  protected void onActivityResult(int requestcode, int resultcode, Intent data) {
+    super.onActivityResult(requestcode, resultcode, data);
+    if (resultcode == RESULT_NIGHT_MODE_CHANGED) {
+      recreate();
+    }
   }
 
   private void setUpToolbar() {

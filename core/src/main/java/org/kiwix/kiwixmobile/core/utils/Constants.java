@@ -40,6 +40,8 @@ public final class Constants {
   // Result stuff
   public static final int RESULT_RESTART = 1236;
 
+  public static final int RESULT_NIGHT_MODE_CHANGED = 1237;
+
   public static final int RESULT_HISTORY_CLEARED = 1239;
 
   // Tags

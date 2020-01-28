@@ -52,6 +52,7 @@ import org.kiwix.kiwixmobile.core.main.AddNoteDialog;
 import org.kiwix.kiwixmobile.core.utils.LanguageUtils;
 import org.kiwix.kiwixmobile.core.utils.SharedPreferenceUtil;
 
+import static org.kiwix.kiwixmobile.core.utils.Constants.RESULT_NIGHT_MODE_CHANGED;
 import static org.kiwix.kiwixmobile.core.utils.Constants.RESULT_RESTART;
 import static org.kiwix.kiwixmobile.core.utils.SharedPreferenceUtil.PREF_NIGHT_MODE;
 import static org.kiwix.kiwixmobile.core.utils.SharedPreferenceUtil.PREF_STORAGE;
@@ -189,6 +190,7 @@ public abstract class CorePrefsFragment extends PreferenceFragment implements
     }
     if (key.equals(PREF_NIGHT_MODE)) {
       sharedPreferenceUtil.updateNightMode();
+      getActivity().setResult(RESULT_NIGHT_MODE_CHANGED);
     }
   }
 

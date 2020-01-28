@@ -47,6 +47,7 @@ public class SharedPreferenceUtil {
   public static final String PREF_KIWIX_MOBILE = "kiwix-mobile";
   public static final String PREF_ZOOM = "pref_zoom_slider";
   public static final String PREF_ZOOM_ENABLED = "pref_zoom_enabled";
+  public static final String PREF_NIGHT_MODE = "pref_night_mode";
   public static final String PREF_SHOW_INTRO = "showIntro";
   private static final String PREF_BACK_TO_TOP = "pref_backtotop";
   private static final String PREF_HIDE_TOOLBAR = "pref_hidetoolbar";
@@ -58,7 +59,6 @@ public class SharedPreferenceUtil {
   private static final String PREF_SHOW_BOOKMARKS_CURRENT_BOOK = "show_bookmarks_current_book";
   private static final String PREF_SHOW_HISTORY_CURRENT_BOOK = "show_history_current_book";
   private static final String PREF_HOSTED_BOOKS = "hosted_books";
-  public static final String PREF_NIGHT_MODE = "pref_night_mode";
   private SharedPreferences sharedPreferences;
   private final PublishProcessor<String> prefStorages = PublishProcessor.create();
   private final PublishProcessor<NightModeConfig.Mode> nightModes = PublishProcessor.create();
@@ -74,6 +74,10 @@ public class SharedPreferenceUtil {
 
   public boolean getPrefHideToolbar() {
     return sharedPreferences.getBoolean(PREF_HIDE_TOOLBAR, true);
+  }
+
+  public String getPrefNightMode() {
+    return sharedPreferences.getString(PREF_NIGHT_MODE, ""+AppCompatDelegate.MODE_NIGHT_FOLLOW_SYSTEM);
   }
 
   public boolean getPrefIsFirstRun() {
